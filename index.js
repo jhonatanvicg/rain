@@ -1,119 +1,154 @@
-const canvas = document.getElementById("canvas");
+const canvas = document.getElementById('canvas');
 
-const context = canvas.getContext("2d");
+//Setting Canvas to 2D
+const context = canvas.getContext('2d');
+let background = new Image();
+background.src = "./assets/imgs/thumb-1920-977479.png"
 
+//FullScreen the canvas
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-window.addEventListener("resize",()=>{
+//Resizes Canvas when window widht and height resizes
+window.addEventListener('resize',()=>{
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 });
 
-let waterDropsArray = []
-let waterParticlesArray = []
+//All Water Drops will be stored here
+let waterDropsArray = [];
 
-function WaterDrops(){
-    console.log("CREANDO GOTAS")
-    this.x = Math.floor(((window.innerWidth/2) - 140) + Math.floor(Math.random() * innerWidth / 6));
-    this.y = 180;
+//All Water Particles will be stored here
+let waterParticlesArray = [];
+let height = 0;
+let maxHeight = 10;
+const dropColor = 'rgba(16,160,244,.71)';
 
-    this.size = 15;
 
-    //speed of velocity of drops
-    let speedArray = [10,8,9,10,5,15,9,5,10,9,9,9,10,15,8,9,10,11,12,15];
-    let speedY = speedArray[Math.floor(Math.random() * speedArray.length)];
+//Function for Water Drops
+function WaterDrops() {
+    
+    this.x = Math.floor(Math.floor(Math.random() * window.innerWidth ));
+    this.y = 0;
 
-    //UPDATE FUNCTION FOR FALLING DROPS
+    this.size = 5;
+
+    //Speed of moving the water drops of Y axis
+    let speedArray = [10,8.9,8,11,10.5,7,9,15,11.7,10.7,10.1,15.4,11.1,12,12.54];
+    let speedY = speedArray[Math.floor(Math.random()* speedArray.length)];
+
+    //Updates Drop Position on Y axis (Falling down)
     this.update = ()=>{
-        this.y += speedY;
+        this.y += speedY
     }
 
+    //Renders the Drop on Canvas
     this.draw = ()=>{
-        context.fillStyle = "white";
+        context.fillStyle = dropColor;
         context.beginPath();
-        context.arc(this.x,this.y, this.size,0,Math.PI * 2);
+        context.arc(this.x,this.y,this.size,0,Math.PI * 2);
         context.fill();
     }
-
 }
 
-function WaterParticles(x){
-    console.log("CREANDO GOTAS")
+
+//Function for Water Particles (Dropped)
+function WaterParticles(x) {
+    
     this.x = x;
-    this.y = window.innerHeight - 100;
+    this.y = window.innerHeight - height;
 
     this.size = Math.random() * 3 + 2;
 
-    //speed of velocity of drops
-    let speedX = Math.random() * 3 + 1.5;
+    //Speed of moving the water drops of Y axis
+    let speedX = Math.random()*3 - 1.5;
     let speedY = Math.random() - 1.5;
 
-    //UPDATE FUNCTION FOR FALLING DROPS
+    //Updates Drop Position on Y axis (Falling down)
     this.update = ()=>{
         this.y += speedY;
         this.x += speedX;
-        if(this.size > .2)
-        {
+        if (this.size > .2) {
             this.size -= .1;
         }
     }
 
+    //Renders the Water Particle on Canvas
     this.draw = ()=>{
-        context.fillStyle = "white";
+        context.fillStyle = dropColor;
         context.beginPath();
-        context.arc(this.x,this.y, this.size,0,Math.PI * 2);
+        context.arc(this.x,this.y,this.size,0,Math.PI * 2);
         context.fill();
     }
-
 }
 
-function renderWaterParticles(){
-    for(let i; i < waterParticlesArray.length; i++){
-        waterParticlesArray[i].draw();
-        waterParticlesArray[i].update();
-        if(waterParticlesArray[i].size <= .2)
-        {
+
+//Function to update and draw every water object in water particles array using For Loop
+function renderWaterParticles() {
+    for (let i = 0; i < waterParticlesArray.length; i++) {
+        waterParticlesArray[i].draw(); //Render the drop on the canvas
+        waterParticlesArray[i].update(); //Update the position on the canvas
+        if (waterParticlesArray[i].size <= .2) {
             waterParticlesArray.splice(i,1);
             i--;
         }
     }
 }
 
-function renderWaterDrop(){
-    for(let i; i < waterDropsArray.length; i++){
-        waterDropsArray[i].draw();
-        waterDropsArray[i].update();
-        if(waterDropsArray[i].y >= window.innerHeight - 100)
-        {
-            for (let j = 0; j < 12; j++) 
-            {
-                waterParticlesArray.push(new WaterDrops(waterDropsArray[i].x))                
+//Function to update and draw every water object in water drops array using For Loop
+function renderWaterDrops() {
+    for (let i = 0; i < waterDropsArray.length; i++) {
+        waterDropsArray[i].draw(); //Render the drop on the canvas
+        waterDropsArray[i].update(); //Update the position on the canvas
+        if (waterDropsArray[i].y >= window.innerHeight - height) {
+            for (let index = 0; index < 20; index++) {
+                waterParticlesArray.push(new WaterParticles(waterDropsArray[i].x))
+                
             }
             waterDropsArray.splice(i,1);
+
             i--;
         }
     }
 }
 
-//ANIMATE FUNCTION
-function animate(){
-    context.fillStyle = "rgba(24,28,31,1)";
-    context.fillRect(0,0,canvas.height,canvas.width);
-    context.fillStyle = "white";
-    context.beginPath();
-    context.rect(window.innerWidth / 4, window.innerHeight - 100, window.innerWidth / 2,4);
-    context.fill();
-    renderWaterDrop();
+
+//Animate Function
+function animate() {
+    height = Math.floor(Math.random()  * maxHeight)
+    context.drawImage(background,0,0);   
+    context.fillStyle = 'rgba(121,121,121,0.52)';
+    context.fillRect(0,0,canvas.width,canvas.height);
+    // context.fillStyle = 'white';
+    //Bottom Line
+    // context.beginPath();
+    // context.rect(window.innerWidth / 4,window.innerHeight - 100, window.innerWidth / 2,4);
+    // context.fill();
+
+    renderWaterDrops();
     renderWaterParticles();
-    requestAnimationFrame(animate)
+    requestAnimationFrame(animate);
 }
 
-for(let i = 0; i < 10;i++)
-{
-    waterDropsArray.push(new WaterDrops())
+let sfx = {
+    push: new Howl({
+        src:['./assets/sounds/713222__newlocknew__rain_raingardenverandaon-different-surfaces.wav'],
+        loop:true
+    })
+}
+function PlayMusic(){
+    sfx.push.play();
 }
 
-animate()
+// background.onload = function(){
+//     context.drawImage(background,0,0);   
+// }
+animate();
+PlayMusic();
 
-waterParticlesArray.push(new WaterDrops())
+//Interval to render water drops 
+setInterval(() => {
+    for (let i = 0; i < 7; i++) {
+        waterDropsArray.push(new WaterDrops())
+    }
+}, 100);
