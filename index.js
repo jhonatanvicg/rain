@@ -58,7 +58,7 @@ function WaterParticles(x) {
     this.x = x;
     this.y = window.innerHeight - height;
 
-    this.size = Math.random() * 3 + 2;
+    this.size = Math.random() * 3 + .5;
 
     //Speed of moving the water drops of Y axis
     let speedX = Math.random()*3 - 1.5;
@@ -101,7 +101,7 @@ function renderWaterDrops() {
         waterDropsArray[i].draw(); //Render the drop on the canvas
         waterDropsArray[i].update(); //Update the position on the canvas
         if (waterDropsArray[i].y >= window.innerHeight - height) {
-            for (let index = 0; index < 20; index++) {
+            for (let index = 0; index < 10; index++) {
                 waterParticlesArray.push(new WaterParticles(waterDropsArray[i].x))
                 
             }
@@ -148,7 +148,7 @@ PlayMusic();
 
 //Interval to render water drops 
 setInterval(() => {
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 27; i++) {
         waterDropsArray.push(new WaterDrops())
     }
 }, 100);
