@@ -23,6 +23,9 @@ let waterParticlesArray = [];
 let height = 0;
 let maxHeight = 10;
 const dropColor = 'rgba(16,160,244,.71)';
+let tiles = []
+
+
 
 
 //Function for Water Drops
@@ -38,7 +41,6 @@ function WaterDrops() {
 
     this.size = 5;
     this.ground = false;
-
     //Speed of moving the water drops of Y axis
     let speedArray = [10,8.9,8,11,10.5,7,9,15,11.7,10.7,10.1,15.4,11.1,12,12.54];
     let speedY = speedArray[Math.floor(Math.random()* speedArray.length)];
@@ -46,15 +48,18 @@ function WaterDrops() {
     //Updates Drop Position on Y axis (Falling down)
     this.update = ()=>{
         this.y += speedY
-        if(this.y >= this.limitY && !this.ground)
-        {
-            if(this.x >= 100 && this.x <= 400)
-            {
+        tiles.forEach(tile =>{
 
-                this.ground =true;
-                console.log("PISO")
+            if(this.y >= tile.topCoordinates.init.y && !this.ground)
+            {
+                if(this.x >= tile.topCoordinates.init.x && this.x <= tile.topCoordinates.end.x)
+                {
+    
+                    this.ground =true;
+                    console.log("PISO")
+                }
             }
-        }
+        })
     }
 
 
@@ -127,7 +132,73 @@ function renderWaterDrops() {
         }
     }
 }
+function Tile(
+    initXPosition = 0,
+    initYPosition = 0,
+    width = 200,
+    height = 100,
+    figure = "",
+    fillColor = "white"
+){
+    
+    this.initXPosition = initXPosition;
+    this.initYPosition = initYPosition;
+    this.width = width;
+    this.height = height;
+    this.figure = figure;
+    this.fillColor = fillColor;
+    this.topCoordinates = {
+        init:{
+            x:0,
+            y:0
+        },
+        end:{
+            x:0,
+            y:0
+        }
+    };
 
+
+    this.draw = ()=>
+    {
+        context.fillStyle = this.fillColor;
+        context.fillRect(this.initXPosition,this.initYPosition,this.width,this.height)
+        this.topCoordinates.init.x = this.initXPosition;
+        this.topCoordinates.init.y = this.initYPosition;
+        this.topCoordinates.end.x = this.topCoordinates.init.x + this.width;
+        this.topCoordinates.end.y = this.topCoordinates.init.y;
+
+        context.fillStyle = "green";
+        context.beginPath();
+        context.arc(this.topCoordinates.init.x,this.topCoordinates.init.y,10,0,Math.PI * 2);
+        context.arc(this.topCoordinates.end.x,this.topCoordinates.end.y,10,0,Math.PI * 2);
+        context.fill();
+    }
+}
+
+function renderTiles(){
+
+    for (let i = 0; i < tiles.length; i++) {
+        tiles[i].draw()
+    }
+}
+
+function randomValue(min = 0, max = 1)
+{
+    return Math.floor( Math.random() * ((max) - min + 1 ) + min)
+}
+
+
+console.log(`MEDIDAS PANTALLA; WIDTH: ${window.innerWidth}, HEIGHT: ${window.innerHeight}`)
+const numberTiles = 8
+for (let i = 0; i < numberTiles; i++) {
+    let tileX = Math.floor(Math.random() * ((window.innerWidth - 350) - 0 + 1) + 0)
+    let tileY = Math.floor(Math.random() * ((window.innerHeight - 100) - 0 + 1) + 0)
+    let tileWidth = randomValue(10,100)
+    console.log(`ITERACION ${i} X: ${tileX}`)
+    console.log(`ITERACION ${i} Y: ${tileY}`)
+    tiles.push(new Tile(tileX,tileY,tileWidth));    
+}
 
 //Animate Function
 function animate() {
@@ -136,8 +207,8 @@ function animate() {
     // context.fillStyle = 'rgba(121,121,121,0.52)';
     context.fillStyle = 'black';
     context.fillRect(0,0,canvas.width,canvas.height);
-    context.fillStyle = 'white';
-    context.fillRect(100,window.innerHeight /2,300,150);
+    // context.fillStyle = 'white';
+    // context.fillRect(100,window.innerHeight /2,300,150);
 
     // context.beginPath();
     // context.rect(window.innerWidth / 4,window.innerHeight - 100, window.innerWidth / 2,4);
@@ -145,6 +216,7 @@ function animate() {
 
     renderWaterDrops();
     renderWaterParticles();
+    renderTiles();
     requestAnimationFrame(animate);
 }
 
@@ -163,7 +235,6 @@ function PlayMusic(){
 // }
 animate();
 PlayMusic();
-
 //Interval to render water drops 
 setInterval(() => {
     for (let i = 0; i < 15; i++) {
