@@ -28,10 +28,16 @@ const dropColor = 'rgba(16,160,244,.71)';
 //Function for Water Drops
 function WaterDrops() {
     
+    this.limitY = window.innerHeight / 2
+    this.limitXMin = 100
+    this.limitXMax = 400
+    // this.limitY = window.innerHeight /2
+    // console.log(`LIMITE DE GOTAS: ${this.limitY}`)
     this.x = Math.floor(Math.floor(Math.random() * window.innerWidth ));
     this.y = 0;
 
     this.size = 5;
+    this.ground = false;
 
     //Speed of moving the water drops of Y axis
     let speedArray = [10,8.9,8,11,10.5,7,9,15,11.7,10.7,10.1,15.4,11.1,12,12.54];
@@ -40,7 +46,17 @@ function WaterDrops() {
     //Updates Drop Position on Y axis (Falling down)
     this.update = ()=>{
         this.y += speedY
+        if(this.y >= this.limitY && !this.ground)
+        {
+            if(this.x >= 100 && this.x <= 400)
+            {
+
+                this.ground =true;
+                console.log("PISO")
+            }
+        }
     }
+
 
     //Renders the Drop on Canvas
     this.draw = ()=>{
@@ -53,10 +69,10 @@ function WaterDrops() {
 
 
 //Function for Water Particles (Dropped)
-function WaterParticles(x) {
+function WaterParticles(x,y) {
     
     this.x = x;
-    this.y = window.innerHeight - height;
+    this.y = y
 
     this.size = Math.random() * 3 + .5;
 
@@ -100,9 +116,9 @@ function renderWaterDrops() {
     for (let i = 0; i < waterDropsArray.length; i++) {
         waterDropsArray[i].draw(); //Render the drop on the canvas
         waterDropsArray[i].update(); //Update the position on the canvas
-        if (waterDropsArray[i].y >= window.innerHeight - height) {
-            for (let index = 0; index < 10; index++) {
-                waterParticlesArray.push(new WaterParticles(waterDropsArray[i].x))
+        if (waterDropsArray[i].ground) {
+            for (let index = 0; index < 20; index++) {
+                waterParticlesArray.push(new WaterParticles(waterDropsArray[i].x, waterDropsArray[i].y))
                 
             }
             waterDropsArray.splice(i,1);
@@ -116,11 +132,13 @@ function renderWaterDrops() {
 //Animate Function
 function animate() {
     height = Math.floor(Math.random()  * maxHeight)
-    context.drawImage(background,0,0);   
-    context.fillStyle = 'rgba(121,121,121,0.52)';
+    // context.drawImage(background,window.innerHeight,0);   
+    // context.fillStyle = 'rgba(121,121,121,0.52)';
+    context.fillStyle = 'black';
     context.fillRect(0,0,canvas.width,canvas.height);
-    // context.fillStyle = 'white';
-    //Bottom Line
+    context.fillStyle = 'white';
+    context.fillRect(100,window.innerHeight /2,300,150);
+
     // context.beginPath();
     // context.rect(window.innerWidth / 4,window.innerHeight - 100, window.innerWidth / 2,4);
     // context.fill();
@@ -148,7 +166,8 @@ PlayMusic();
 
 //Interval to render water drops 
 setInterval(() => {
-    for (let i = 0; i < 27; i++) {
+    for (let i = 0; i < 15; i++) {
         waterDropsArray.push(new WaterDrops())
     }
 }, 100);
+        // waterDropsArray.push(new WaterDrops())
