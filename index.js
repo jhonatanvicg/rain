@@ -2,8 +2,11 @@ const canvas = document.getElementById('canvas');
 
 //Setting Canvas to 2D
 const context = canvas.getContext('2d');
+const bottomGap = 5
 let background = new Image();
 background.src = "./assets/imgs/thumb-1920-977479.png"
+const TILE_IMAGE = document.getElementById('tilemap');
+
 
 //FullScreen the canvas
 canvas.width = window.innerWidth;
@@ -121,15 +124,16 @@ function renderWaterDrops() {
     for (let i = 0; i < waterDropsArray.length; i++) {
         waterDropsArray[i].draw(); //Render the drop on the canvas
         waterDropsArray[i].update(); //Update the position on the canvas
-        if (waterDropsArray[i].ground) {
+        if (waterDropsArray[i].ground || waterDropsArray[i].y > window.innerHeight - bottomGap) {
             for (let index = 0; index < 20; index++) {
                 waterParticlesArray.push(new WaterParticles(waterDropsArray[i].x, waterDropsArray[i].y))
                 
             }
             waterDropsArray.splice(i,1);
-
             i--;
         }
+
+
     }
 }
 function Tile(
@@ -163,6 +167,17 @@ function Tile(
     {
         context.fillStyle = this.fillColor;
         context.fillRect(this.initXPosition,this.initYPosition,this.width,this.height)
+        context.drawImage(
+            TILE_IMAGE,
+            195,
+            195,
+            100,
+            150,
+            this.initXPosition,
+            this.initYPosition,
+            100,
+            100
+        );
         this.topCoordinates.init.x = this.initXPosition;
         this.topCoordinates.init.y = this.initYPosition;
         this.topCoordinates.end.x = this.topCoordinates.init.x + this.width;
@@ -190,18 +205,23 @@ function randomValue(min = 0, max = 1)
 
 
 console.log(`MEDIDAS PANTALLA; WIDTH: ${window.innerWidth}, HEIGHT: ${window.innerHeight}`)
-const numberTiles = 8
-for (let i = 0; i < numberTiles; i++) {
-    let tileX = Math.floor(Math.random() * ((window.innerWidth - 350) - 0 + 1) + 0)
-    let tileY = Math.floor(Math.random() * ((window.innerHeight - 100) - 0 + 1) + 0)
-    let tileWidth = randomValue(10,100)
-    console.log(`ITERACION ${i} X: ${tileX}`)
-    console.log(`ITERACION ${i} Y: ${tileY}`)
-    tiles.push(new Tile(tileX,tileY,tileWidth));    
-}
+// const numberTiles = 8
+// for (let i = 0; i < numberTiles; i++) {
+//     let tileX = Math.floor(Math.random() * ((window.innerWidth - 350) - 0 + 1) + 0)
+//     let tileY = Math.floor(Math.random() * ((window.innerHeight - 100) - 0 + 1) + 0)
+//     let tileWidth = randomValue(10,100)
+//     console.log(`ITERACION ${i} X: ${tileX}`)
+//     console.log(`ITERACION ${i} Y: ${tileY}`)
+//     tiles.push(new Tile(tileX,tileY,tileWidth));    
+// }
 
+function addTiles(tileX,tileY,tileWidth){
+    tiles.push(new Tile(tileX,tileY,tileWidth));    
+
+}
 //Animate Function
 function animate() {
+    
     height = Math.floor(Math.random()  * maxHeight)
     // context.drawImage(background,window.innerHeight,0);   
     // context.fillStyle = 'rgba(121,121,121,0.52)';
@@ -213,11 +233,20 @@ function animate() {
     // context.beginPath();
     // context.rect(window.innerWidth / 4,window.innerHeight - 100, window.innerWidth / 2,4);
     // context.fill();
-
+    
     renderWaterDrops();
     renderWaterParticles();
     renderTiles();
     requestAnimationFrame(animate);
+    context.font = "bold 26px Arial";
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillStyle = "white";
+    
+
+    
+    context.fillText(`Numero de gotas: ${waterDropsArray.length}`, 150, 50);
+    context.fillText(`Numero de Particulas: ${waterParticlesArray.length}`, 160,100);
 }
 
 let sfx = {
@@ -241,4 +270,11 @@ setInterval(() => {
         waterDropsArray.push(new WaterDrops())
     }
 }, 100);
-        // waterDropsArray.push(new WaterDrops())
+let cursorX = 0;
+let cursorY = 0;
+canvas.addEventListener('click', function(event) { 
+    console.log(`click: event: ${event.clientX}`)
+    console.log(`click: event: ${event.clientY}`)
+    addTiles(event.clientX, event.clientY,100)
+}, false);
+

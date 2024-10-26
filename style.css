@@ -8,6 +8,10 @@ body{
     /* background-image: url('./assets/imgs/thumb-1920-977479.png'); */
 }
 
+#tilemap{
+    display: none;
+}
+
 
 
 /* .cloud{
